@@ -3,6 +3,8 @@ Disclaimer
 
 I am NOT a javascript developer. I am hacking this apart to serve my own purposes and just have it not crash. Expect errors.
 
+This branch contains the option to turn off point badges on cards. Next I will hopefully change the update interval.
+
 Scrum for Trello
 ===========
 
