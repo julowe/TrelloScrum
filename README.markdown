@@ -17,7 +17,7 @@ make use of story points in Trello.
 Setup
 -----
 
-The orignal Scrum for Trello is a Chrome extension and you can install it via the Chrome Webstore, and was the wonderful source of this fork. 
+The original Scrum for Trello is a Chrome extension and you can install it via the Chrome Webstore, and was the wonderful source of this fork.
 
 To install this fork/version, clone this repository and load the TrelloScrum folder as an unpacked extension.
 (Under chrome://extensions/ turn on developer mode, then click load unpacked extension and point to the cloned directory.)
@@ -49,4 +49,3 @@ Great improvements made by @nicpottier and @paullofte:
 * The point value is moved to be a badge on the card.
 * Added support for Zero Point Cards (0), Unknown Point Cards (?), Decimal Value Cards (.5)
 * In addition I added the functionality to have the list total reflect the current filtered set of cards.
-
