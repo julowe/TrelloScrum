@@ -3,6 +3,8 @@ Disclaimer
 
 I am NOT a javascript developer. I am hacking this apart to serve my own purposes and just have it not crash. Expect errors.
 
+This branch contains the option to turn off point badges on cards, and is a work in progress to update to jQuery 3. I do not know if it would actually be useful to upgrade to 3, but I figured I'd stash the files here so I can come back to it just a little bit easier. I may have to change the order or way that the migrate script is called. No timeline for any work to be done on this...
+
 Scrum for Trello
 ===========
 
