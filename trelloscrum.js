@@ -52,11 +52,15 @@ var S4T_SETTINGS = [];
 var SETTING_NAME_LINK_STYLE = "burndownLinkStyle";
 var SETTING_NAME_ESTIMATES = "estimatesSequence";
 var SETTING_NAME_SHOWCARDPOINTS = "showCardPoints";
-var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES, SETTING_NAME_SHOWCARDPOINTS];
+var SETTING_NAME_TIMER1 = "refreshTimer";
+var SETTING_NAME_TIMER2 = "otherRefreshTimer"; //Yeah, i don't exactly know what this does
+var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES, SETTING_NAME_SHOWCARDPOINTS, SETTING_NAME_TIMER1, SETTING_NAME_TIMER2];
 var S4T_SETTING_DEFAULTS = {};
 S4T_SETTING_DEFAULTS[SETTING_NAME_LINK_STYLE] = 'full';
 S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
 S4T_SETTING_DEFAULTS[SETTING_NAME_SHOWCARDPOINTS] = 'no';
+S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1] = 500;
+S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER2] = 250;
 
 //internals
 var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
@@ -120,7 +124,7 @@ $(function(){
 	$('.js-input').on('keyup', calcListPoints);
 	$('.js-share').off('mouseup');
 	$('.js-share').on('mouseup',function(){
-		setTimeout(checkExport,500)
+		setTimeout(checkExport,S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1])
 	});
 
 	calcListPoints();
@@ -134,7 +138,7 @@ var recalcListAndTotal = debounce(function($el){
 			this.list.refreshList(); // make sure each card's points are still accurate (also calls list.calc()).
 		}
 	})
-}, 500, false);
+}, S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1], false);
 
 var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 {
@@ -529,11 +533,11 @@ function List(el){
 		});
 	};
 
-	// All calls to calc are throttled to happen no more than once every 500ms (makes page-load and recalculations much faster).
+	// All calls to calc are throttled to happen no more than once every S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1]ms (makes page-load and recalculations much faster). was 500ms
 	var self = this;
 	this.calc = debounce(function(){
 		self._calcInner();
-    }, 500, true); // executes right away unless over its 500ms threshold since the last execution
+  }, S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1], true); // executes right away unless over its S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1]ms threshold since the last execution was 500ms
 	this._calcInner	= function(e){ // don't call this directly. Call calc() instead.
 		//if(e&&e.target&&!$(e.target).hasClass('list-card')) return; // TODO: REMOVE - What was this? We never pass a param into this function.
 		clearTimeout(to);
@@ -562,7 +566,7 @@ function List(el){
     this.refreshList = debounce(function(){
         readCard($list.find('.list-card:not(.placeholder)'));
         this.calc(); // readCard will call this.calc() if any of the cards get refreshed.
-    }, 500, false);
+    }, S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER1], false);
 
 	var cardAddedRemovedObserver = new CrossBrowser.MutationObserver(function(mutations)
 	{
@@ -644,7 +648,7 @@ function ListCard(el, identifier){
 	var self = this;
 	this.refresh = debounce(function(){
 		self._refreshInner();
-    }, 250, true); // executes right away unless over its 250ms threshold
+  }, S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER2], true); // executes right away unless over its S4T_SETTING_DEFAULTS[SETTING_NAME_TIMER2]ms threshold. was 250ms
 	this._refreshInner=function(){
 		if(busy) return;
 		busy = true;
