@@ -56,7 +56,7 @@ var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES, SETTING
 var S4T_SETTING_DEFAULTS = {};
 S4T_SETTING_DEFAULTS[SETTING_NAME_LINK_STYLE] = 'full';
 S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
-S4T_SETTING_DEFAULTS[SETTING_NAME_SHOWCARDPOINTS] = 'no';
+S4T_SETTING_DEFAULTS[SETTING_NAME_SHOWCARDPOINTS] = 'yes';
 
 //internals
 var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
@@ -281,8 +281,8 @@ function showSettings()
 	{
 		// Load the current settings (with defaults in case Settings haven't been set).
 		var setting_link = S4T_SETTINGS[SETTING_NAME_LINK_STYLE];
-    var setting_estimateSeq = S4T_SETTINGS[SETTING_NAME_ESTIMATES];
-    var setting_showCardPoints = S4T_SETTINGS[SETTING_NAME_SHOWCARDPOINTS];
+		var setting_estimateSeq = S4T_SETTINGS[SETTING_NAME_ESTIMATES];
+		var setting_showCardPoints = S4T_SETTINGS[SETTING_NAME_SHOWCARDPOINTS];
 
 		var settingsDiv = $('<div/>', {style: "padding:0px 10px;font-family:'Helvetica Neue', Arial, Helvetica, sans-serif;"});
 		var iframeHeader = $('<h3/>', {style: 'text-align: center;'});
@@ -355,15 +355,15 @@ function showSettings()
         showCardPointsRadio_yes.prop('checked', true);
       }
       var label_yes = $('<label/>', {for: 'showPoints_yes'});
-      label_yes.text('Show Point Badges on Cards');
+      label_yes.text('Show Point Badges on Cards (Default)');
       fieldset_showCardPoints.append(showCardPointsRadio_yes).append(label_yes).append("<br/>");
 
       var showCardPointsRadio_no = $('<input/>', {type: 'radio', name: showCardPointsSetting_radioName, id: 'showPoints_no', value: 'no'});
       if(setting_showCardPoints == 'no'){
         showCardPointsRadio_no.prop('checked', true);
       }
-      var label_no = $('<label/>', {for: 'link_icon'});
-      label_no.text('Do Not Show Point Badges on Cards');
+      var label_no = $('<label/>', {for: 'showPoints_no'});
+      label_no.text('Do Not Show Point Badges on Cards (Can improve performance)');
       fieldset_showCardPoints.append(showCardPointsRadio_no).append(label_no).append("<br/>");
       var showCardPointsInstructions = $('<div/>', {style: 'margin-top:5px'}).text("If you change this option, please reload the page. Not showing badges can resolve issues with powerups, etc.");
       fieldset_showCardPoints.append(showCardPointsInstructions);
@@ -374,7 +374,7 @@ function showSettings()
 			// Save the settings (persists them using Chrome cloud, LocalStorage, or Cookies - in that order of preference if available).
 			S4T_SETTINGS[SETTING_NAME_LINK_STYLE] = $('#'+settingsFrameId).contents().find('input:radio[name='+burndownLinkSetting_radioName+']:checked').val();
 			S4T_SETTINGS[SETTING_NAME_ESTIMATES] = $('#'+settingsFrameId).contents().find('#'+estimateFieldId).val();
-      S4T_SETTINGS[SETTING_NAME_SHOWCARDPOINTS] = $('#'+settingsFrameId).contents().find('input:radio[name='+showCardPointsSetting_radioName+']:checked').val();
+			S4T_SETTINGS[SETTING_NAME_SHOWCARDPOINTS] = $('#'+settingsFrameId).contents().find('input:radio[name='+showCardPointsSetting_radioName+']:checked').val();
 
 			// Persist all settings.
 			$.each(S4T_ALL_SETTINGS, function(i, settingName){
@@ -390,7 +390,7 @@ function showSettings()
 		// Set up the form (all added down here to be easier to change the order).
 		settingsForm.append(fieldset_burndownLink);
 		settingsForm.append(fieldset_estimateButtons);
-    settingsForm.append(fieldset_showCardPoints);
+		settingsForm.append(fieldset_showCardPoints);
 		settingsForm.append(saveButton);
 		settingsForm.append(savedIndicator);
 	}
@@ -624,7 +624,7 @@ function ListCard(el, identifier){
   		that=this,
   		busy=false,
   		$card=$(el),
-      $badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>'),
+  		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>'),
   		to,
   		to2;
     } else {
@@ -673,7 +673,7 @@ function ListCard(el, identifier){
 
 			clearTimeout(to2);
 			to2 = setTimeout(function(){
-        if (setting_showCardPoints == 'yes') {
+  			if (setting_showCardPoints == 'yes') {
   				// Add the badge (for this point-type: regular or consumed) to the badges div.
   				$badge
   					.text(that.points)
