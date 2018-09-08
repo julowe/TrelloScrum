@@ -363,10 +363,10 @@ function showSettings()
         showCardPointsRadio_no.prop('checked', true);
       }
       var label_no = $('<label/>', {for: 'link_icon'});
-      label_no.text('Do Not Show Point Badges on Cards (recommended)');
+      label_no.text('Do Not Show Point Badges on Cards');
       fieldset_showCardPoints.append(showCardPointsRadio_no).append(label_no).append("<br/>");
-
-
+      var showCardPointsInstructions = $('<div/>', {style: 'margin-top:5px'}).text("If you change this option, please reload the page. Not showing badges can resolve issues with powerups, etc.");
+      fieldset_showCardPoints.append(showCardPointsInstructions);
 
 		var saveButton = $('<button/>', {style:'margin-top:5px'}).text('Save Settings').click(function(e){
 			e.preventDefault();
@@ -405,7 +405,7 @@ function showSettings()
 		</ol>\
 	</div>');
 
-	var moreInfoLink = $('<small>For more information, see <a href="http://scrumfortrello.com">ScrumForTrello.com</a></small>');
+	var moreInfoLink = $('<small>For more information, see <a href="http://scrumfortrello.com">ScrumForTrello.com</a> and/or <a href="https://github.com/julowe/TrelloScrum">my fork</a></small>');
 
 	// Add each of the components to build the iframe (all done here to make it easier to re-order them).
 	settingsDiv.append(iframeHeader);
@@ -417,7 +417,7 @@ function showSettings()
 
 	// Trello swallows normal input, so things like checkboxes and radio buttons don't work right... so we stuff everything in an iframe.
 	var iframeObj = $('<iframe/>', {frameborder: '0',
-						 style: 'width: 670px; height: 578px;', /* 512 was fine on Chrome, but FF requires 528 to avoid scrollbars */
+						 style: 'width: 670px; height: 610px;', /* 512 was fine on Chrome, but FF requires 528 to avoid scrollbars */
 						 id: settingsFrameId,
 	});
 	$windowWrapper = $('.window-wrapper');
@@ -607,6 +607,7 @@ function List(el){
 
 //.list-card pseudo
 function ListCard(el, identifier){
+  var setting_showCardPoints = S4T_SETTINGS[SETTING_NAME_SHOWCARDPOINTS];
 	if(el.listCard && el.listCard[identifier]) return;
 
 	//lazily create object
@@ -615,16 +616,28 @@ function ListCard(el, identifier){
 	}
 	el.listCard[identifier]=this;
 
-	var points=-1,
-		consumed=identifier!=='points',
-		regexp=consumed?regC:reg,
-		parsed,
-		that=this,
-		busy=false,
-		$card=$(el),
-		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>'),
-		to,
-		to2;
+  if (setting_showCardPoints == 'yes') {
+  	var points=-1,
+  		consumed=identifier!=='points',
+  		regexp=consumed?regC:reg,
+  		parsed,
+  		that=this,
+  		busy=false,
+  		$card=$(el),
+      $badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>'),
+  		to,
+  		to2;
+    } else {
+      var points=-1,
+    		consumed=identifier!=='points',
+    		regexp=consumed?regC:reg,
+    		parsed,
+    		that=this,
+    		busy=false,
+    		$card=$(el),
+    		to,
+    		to2;
+    }
 
 	// MutationObservers may send a bunch of similar events for the same card (also depends on browser) so
 	// refreshes are debounced now.
@@ -660,25 +673,27 @@ function ListCard(el, identifier){
 
 			clearTimeout(to2);
 			to2 = setTimeout(function(){
-				// Add the badge (for this point-type: regular or consumed) to the badges div.
-				$badge
-					.text(that.points)
-					[(consumed?'add':'remove')+'Class']('consumed')
-					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
-					.prependTo($card.find('.badges'));
+        if (setting_showCardPoints == 'yes') {
+  				// Add the badge (for this point-type: regular or consumed) to the badges div.
+  				$badge
+  					.text(that.points)
+  					[(consumed?'add':'remove')+'Class']('consumed')
+  					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+  					.prependTo($card.find('.badges'));
 
-				// Update the DOM element's textContent and data if there were changes.
-				if(titleTextContent != parsedTitle){
-					$title.data('orig-title', titleTextContent); // store the non-mutilated title (with all of the estimates/time-spent in it).
-				}
-				parsedTitle = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
-				el._title = parsedTitle;
-				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
-				if($title[0].childNodes.length > 1){
-					$title[0].childNodes[$title[0].childNodes.length-1].textContent = parsedTitle; // if they keep the card numbers in the DOM
-				} else {
-					$title[0].textContent = parsedTitle; // if they yank the card numbers out of the DOM again.
-				}
+  				// Update the DOM element's textContent and data if there were changes.
+  				if(titleTextContent != parsedTitle){
+  					$title.data('orig-title', titleTextContent); // store the non-mutilated title (with all of the estimates/time-spent in it).
+  				}
+  				parsedTitle = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
+  				el._title = parsedTitle;
+  				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
+  				if($title[0].childNodes.length > 1){
+  					$title[0].childNodes[$title[0].childNodes.length-1].textContent = parsedTitle; // if they keep the card numbers in the DOM
+  				} else {
+  					$title[0].textContent = parsedTitle; // if they yank the card numbers out of the DOM again.
+  				}
+        }
 				var list = $card.closest('.list');
 				if(list[0]){
 					list[0].list.calc();
